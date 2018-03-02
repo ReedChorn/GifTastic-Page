@@ -1,0 +1,24 @@
+h1 {
+    margin-left: 20px;	
+}
+
+label {
+	font-size: 18px;
+}
+
+#starterButtons {
+	margin-right: 5px;
+	margin-left: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+#gif-finder {
+    text-align: center;
+    margin-left: 20px;
+}
+
+.showGiphy {
+	padding: 2px;
+	width: 80%;
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/js" href="javascript/javascript.js">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+
+    <!-- Title -->
+    <h1>Giftastic Page!</h1>
+
+    <!-- Input Form -->
+    <form>
+      <span id="gif-finder">Find GIF: <input id="gif-input" type="text" ><input id="add-gif-input" value="Add Button" type="submit"></span>
+    
+    </form>
+
+    <br>
+
+<!-- GIF Button List -->
+
+<hr>
+
+<div class="row">
+    <div class="container">
+        <div class="btn-group pull-left">
+            <button class="btn btn-primary" id="starterButtons" data-search="Friends">Friends</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="The Office">The Office</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="The IT Crowd">The IT Crowd</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="Silicon Valley">Silicon Valley</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="Stranger Things">Stranger Things</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="Narcos">Narcos</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="Daredevil">Daredevil</button>
+            <button class="btn btn-primary" id="starterButtons" data-search="Scrubs">Scrubs</button>
+            
+      <div id="gif-inputs">
+    </div>
+  </div> 
+</div> 
+
+<div class="row">
+        <div class="container">
+            <span><div id="gifDisplay"></div>
+            </span>
+        </div> 
+      </div> 
+      
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Script -->
+
+<script>
+        // Could be used to locally store the inputs users search for
+        // var gifInputLocalStorage = localStorage.getItem("gif-input")
+        // console.log(gifInputLocalStorage)
+        
+    // Create an initial gifCount variable and array for buttons
+    var gifCount = 0;
+    var gifListArray = [];
+
+
+	//GIPHY AJAX function; Q parameterc for API link set to search term, limit 10 results
+    //Create div with respective still and animate image sources with "data-state", "data-still" and "data-animate" attributes
+ 	function displayShow() {
+
+	var x = $(this).data("search");
+	console.log(x);
+
+    // makes custom image link based on input and limit set to 10
+	var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + x + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+	console.log(queryURL);
+
+  $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).done(function(response) {
+        var results = response.data;
+        console.log(results);
+        for (var i = 0; i < results.length; i++) {
+        
+        var showDiv = $("<div class='col-md-4'>");
+        var rating = results[i].rating;
+        var defaultAnimatedSrc = results[i].images.fixed_height.url;
+        var staticSrc = results[i].images.fixed_height_still.url;
+        var showImage = $("<img>");
+        var p = $("<p>").text("Rating: " + rating);
+        
+        // Making image states
+        showImage.attr("src", staticSrc);
+        showImage.addClass("showGiphy");
+        showImage.attr("data-state", "still");
+        showImage.attr("data-still", staticSrc);
+        showImage.attr("data-animate", defaultAnimatedSrc);
+        
+        // Attaching gif and rating to gifDisplay column
+        showDiv.append(p);
+        showDiv.append(showImage);
+        $("#gifDisplay").prepend(showDiv);
+
+        }
+	});
+}
+
+    //  On Click event associated with the add-gif-input function
+    $("#add-gif-input").on("click", function(event) {
+      event.preventDefault();
+
+      // Get the gif-input "value" from the textbox and store it a variable
+      var gifStorage = $("#gif-input").val().trim();
+      console.log(gifStorage)
+      gifListArray.push(gifStorage)
+      console.log(gifListArray)
+      localStorage.setItem("gif-input", gifListArray.toString())   
+      $("#gif-input").val('');
+      displayButtons();
+
+      // Clear the textbox when done
+      $("#gif-input").val("");
+
+      // Add to the gifCount
+      gifCount++;
+    });
+
+    // Creates button based on input 
+    function displayButtons() {
+    $("#gif-inputs").empty();
+    
+    // appling value attributes
+    for (var i = 0; i < gifListArray.length; i++) {
+      var a = $('<button class="btn btn-primary">');
+      a.attr("id", "starterButtons");
+      a.attr("data-search", gifListArray[i]);
+      a.text(gifListArray[i]);
+      $("#gif-inputs").append(a);
+    }
+  }
+
+    displayButtons();
+  
+    //Click event executes displayShow function
+    $(document).on("click", "#starterButtons", displayShow);
+  
+    //Click event executes pausePlayGifs function
+    $(document).on("click", ".showGiphy", pausePlayGifs);
+  
+    //Function accesses "data-state" attribute and depending on status, changes image source to "data-animate" or "data-still"
+    function pausePlayGifs() {
+    	 var state = $(this).attr("data-state");
+        if (state === "still") {
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animate");
+        } else {
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");
+    }
+}
+
+    </script>
+
+</body>
+</html>
